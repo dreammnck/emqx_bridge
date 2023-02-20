@@ -2,12 +2,17 @@ from fastapi import APIRouter
 import pymongo
 from pymongo import MongoClient
 import threading
+from main import x
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
 
 modelName = []
 #Connect to database
-conn_str = "mongodb+srv://iotHealthcare:edHdnrYXycAmvf4q@dev-iot-healthcare.dk1uvoe.mongodb.net/?retryWrites=true&w=majority"
 try: 
-    client = MongoClient(conn_str)
+    client = MongoClient(os.getenv("CONNECTION_STRING"))
     print(client.list_database_names())
     db = client["iotHealthcare"]
     collection = db["medicalModel"]
@@ -26,15 +31,21 @@ router = APIRouter(
 )
 
 #Trigger
-@router.get("/")
+@router.get("/trigger")
 def trigger():
     ##stop thred
+    x.stop()
+    
     modelName = []
     results = collection.find({})
     for result in results:
         modelName.append(result["modelName"])
+        
+    
+        
     ## start Thred
-    return {"trigger"}
+    x.start()
+    return {"triggered"}
 
 
 

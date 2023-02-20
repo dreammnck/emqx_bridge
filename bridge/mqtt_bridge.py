@@ -1,12 +1,17 @@
 import paho.mqtt.client as mqtt
 from kafka import KafkaProducer
-from kafka.errors import KafkaError, NoBrokersAvailable
-import time
+from kafka.errors import NoBrokersAvailable
 import random
+import time
+#from controller.trigger import modelName
+from dotenv import load_dotenv
+import os
 from controller.trigger import modelName
 
-##TODO: get broker from .env file
-brokers = ["localhost:9092"]
+load_dotenv("/Users/marineyatajoparung/Documents/GitHub/emqx_bridge/env/.env")
+
+brokers = os.getenv("KAFKA_ADVERTISED_HOST_NAME","").split(",")
+print(brokers)
 producer = KafkaProducer(bootstrap_servers=brokers)
 
 ## KAFKA
@@ -67,11 +72,11 @@ def on_message(client, userdata, msg):
 
 
 def mqtt_to_kafka_run():
-    """Pick messages off MQTT queue and put them on Kafka"""
-    broker = 'n460449f.ap-southeast-1.emqx.cloud'
-    port = 15345
-    username = 'emqx'
-    password = 'emqx'
+    #Pick messages off MQTT queue and put them on Kafka
+    broker = os.getenv("EMQX_BROKER")
+    port = os.getenv("EMQX_PORT")
+    username = os.getenv("EMQX_USERNAME")
+    password = os.getenv("EMQX_PASSWORD")
 
     client = mqtt.Client(f'python-mqtt-{random.randint(0, 1000)}')
     client.username_pw_set(username, password)
@@ -81,7 +86,6 @@ def mqtt_to_kafka_run():
 
     client.connect(broker, port, 1000)
     client.loop_forever()
-
 
 def send_all_data():
     attempts = 0
@@ -93,5 +97,7 @@ def send_all_data():
             print("No Brokers. Attempt %s" % attempts)
             attempts = attempts + 1
             time.sleep(2)
+    
+            
             
             
