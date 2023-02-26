@@ -1,15 +1,15 @@
 from fastapi import APIRouter
-import pymongo
 from pymongo import MongoClient
 import threading
-from main import x
 from dotenv import load_dotenv
 import os
+from bridge.mqtt_bridge import send_all_data
 
-load_dotenv()
+load_dotenv("/Users/marineyatajoparung/Documents/GitHub/emqx_bridge/env/.env")
 
-
+thread = threading.Thread(target=send_all_data(), args=(1,))
 modelName = []
+
 #Connect to database
 try: 
     client = MongoClient(os.getenv("CONNECTION_STRING"))
@@ -18,7 +18,7 @@ try:
     collection = db["medicalModel"]
     results = collection.find({})
     for result in results:
-        modelName.append(result["modelName"])
+       modelName.append(result["modelName"])
     print(modelName)
 except Exception:
     print("Error:" + Exception)
@@ -34,7 +34,7 @@ router = APIRouter(
 @router.get("/trigger")
 def trigger():
     ##stop thred
-    x.stop()
+    thread.stop()
     
     modelName = []
     results = collection.find({})
@@ -44,7 +44,7 @@ def trigger():
     
         
     ## start Thred
-    x.start()
+    thread.start()
     return {"triggered"}
 
 

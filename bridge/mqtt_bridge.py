@@ -3,15 +3,12 @@ from kafka import KafkaProducer
 from kafka.errors import NoBrokersAvailable
 import random
 import time
-#from controller.trigger import modelName
 from dotenv import load_dotenv
 import os
-from controller.trigger import modelName
 
 load_dotenv("/Users/marineyatajoparung/Documents/GitHub/emqx_bridge/env/.env")
 
 brokers = os.getenv("KAFKA_ADVERTISED_HOST_NAME","").split(",")
-print(brokers)
 producer = KafkaProducer(bootstrap_servers=brokers)
 
 ## KAFKA
@@ -41,7 +38,7 @@ def on_connect(client, userdata, flags, rc):
     print("Connected %s, %s, %s %s" % (client, userdata, flags, rc))
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
-    client.subscribe(modelName)
+    client.subscribe("controller.modelName")
 
 def on_disconnect(client, user_data, rc):
     """
