@@ -8,6 +8,7 @@ import os
 
 load_dotenv("/Users/marineyatajoparung/Documents/GitHub/emqx_bridge/env/.env")
 
+
 brokers = os.getenv("KAFKA_ADVERTISED_HOST_NAME","").split(",")
 producer = KafkaProducer(bootstrap_servers=brokers)
 
@@ -34,8 +35,11 @@ def on_connect(client, userdata, flags, rc):
     :param rc:
     :return: None
     """
-
-    print("Connected %s, %s, %s %s" % (client, userdata, flags, rc))
+    if rc==0:
+        print("connected OK Returned code=",rc)
+        print("Connected %s, %s, %s %s" % (client, userdata, flags, rc))
+    else:
+        print("Bad connection Returned code=",rc)
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
     client.subscribe("controller.modelName")
@@ -71,17 +75,18 @@ def on_message(client, userdata, msg):
 def mqtt_to_kafka_run():
     #Pick messages off MQTT queue and put them on Kafka
     broker = os.getenv("EMQX_BROKER")
-    port = os.getenv("EMQX_PORT")
+    port = int(os.getenv("EMQX_PORT"))
     username = os.getenv("EMQX_USERNAME")
     password = os.getenv("EMQX_PASSWORD")
+  
 
     client = mqtt.Client(f'python-mqtt-{random.randint(0, 1000)}')
     client.username_pw_set(username, password)
     client.on_connect = on_connect
     client.on_message = on_message
     client.on_disconnect = on_disconnect
-
-    client.connect(broker, port, 1000)
+    
+    client.connect(broker, port, 60)
     client.loop_forever()
 
 def send_all_data():
