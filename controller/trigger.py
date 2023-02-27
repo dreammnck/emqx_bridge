@@ -3,12 +3,12 @@ from pymongo import MongoClient
 import threading
 from dotenv import load_dotenv
 import os
-from bridge.mqtt_bridge import send_all_data
+from bridge.mqtt_bridge import send_all_data, modelName
 
 load_dotenv("/Users/marineyatajoparung/Documents/GitHub/emqx_bridge/env/.env")
 
 thread = threading.Thread(target=send_all_data(), args=(1,))
-modelName = []
+
 
 #Connect to database
 try: 
@@ -46,7 +46,6 @@ def trigger():
     ## start Thred
     thread.start()
     return {"triggered"}
-
 
 
 

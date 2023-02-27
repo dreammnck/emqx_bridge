@@ -1,6 +1,7 @@
 import paho.mqtt.client as mqtt
 from kafka import KafkaProducer
 from kafka.errors import NoBrokersAvailable
+from pymongo import MongoClient
 import random
 import time
 from dotenv import load_dotenv
@@ -8,9 +9,21 @@ import os
 
 load_dotenv("/Users/marineyatajoparung/Documents/GitHub/emqx_bridge/env/.env")
 
-
 brokers = os.getenv("KAFKA_ADVERTISED_HOST_NAME","").split(",")
 producer = KafkaProducer(bootstrap_servers=brokers)
+modelName = []
+
+#Connect to database
+try: 
+    client = MongoClient(os.getenv("CONNECTION_STRING"))
+    db = client["iotHealthcare"]
+    collection = db["medicalModel"]
+    results = collection.find({})
+    for result in results:
+       modelName.append(result["modelName"])
+    print(modelName)
+except Exception:
+    print("Error:" + Exception)
 
 ## KAFKA
 def send_message_to_kafka(topic, message):
@@ -40,9 +53,11 @@ def on_connect(client, userdata, flags, rc):
         print("Connected %s, %s, %s %s" % (client, userdata, flags, rc))
     else:
         print("Bad connection Returned code=",rc)
+        
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
-    client.subscribe("controller.modelName")
+    for model in modelName:
+        client.subscribe(model)
 
 def on_disconnect(client, user_data, rc):
     """
@@ -86,7 +101,7 @@ def mqtt_to_kafka_run():
     client.on_message = on_message
     client.on_disconnect = on_disconnect
     
-    client.connect(broker, port, 60)
+    client.connect(broker, port, 1000)
     client.loop_forever()
 
 def send_all_data():
