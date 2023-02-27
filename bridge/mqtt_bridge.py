@@ -21,7 +21,7 @@ try:
     results = collection.find({})
     for result in results:
        modelName.append(result["modelName"])
-    print(modelName)
+    #print(modelName)
 except Exception:
     print("Error:" + Exception)
 
@@ -33,7 +33,7 @@ def send_message_to_kafka(topic, message):
     :return:
     """
 
-    print("sending message to kafka: %s" % message)
+    #print("sending message to kafka: %s" % message)
     producer.send(topic, message)
 
 
@@ -50,7 +50,7 @@ def on_connect(client, userdata, flags, rc):
     """
     if rc==0:
         print("connected OK Returned code=",rc)
-        print("Connected %s, %s, %s %s" % (client, userdata, flags, rc))
+        #print("Connected %s, %s, %s %s" % (client, userdata, flags, rc))
     else:
         print("Bad connection Returned code=",rc)
         

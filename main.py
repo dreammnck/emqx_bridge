@@ -1,12 +1,12 @@
 from fastapi import FastAPI
-from controller import trigger
+from controller.trigger import thread
 
 
 app = FastAPI()
 app.include_router(trigger.router)
 
 
-"controller.thread".start()
+thread.start()
 
 @app.get("/")
 def root():

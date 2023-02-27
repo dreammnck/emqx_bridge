@@ -13,13 +13,13 @@ thread = threading.Thread(target=send_all_data(), args=(1,))
 #Connect to database
 try: 
     client = MongoClient(os.getenv("CONNECTION_STRING"))
-    print(client.list_database_names())
+    #print(client.list_database_names())
     db = client["iotHealthcare"]
     collection = db["medicalModel"]
     results = collection.find({})
     for result in results:
        modelName.append(result["modelName"])
-    print(modelName)
+    #print(modelName)
 except Exception:
     print("Error:" + Exception)
 
