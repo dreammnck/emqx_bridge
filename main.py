@@ -1,10 +1,9 @@
 from fastapi import FastAPI
-from controller.trigger import thread
+from controller.trigger import thread, router
 
 
 app = FastAPI()
-app.include_router(trigger.router)
-
+app.include_router(router)
 
 thread.start()
 

@@ -5,11 +5,12 @@ from dotenv import load_dotenv
 import os
 from bridge.mqtt_bridge import send_all_data, modelName
 
+
 load_dotenv("/Users/marineyatajoparung/Documents/GitHub/emqx_bridge/env/.env")
 
-thread = threading.Thread(target=send_all_data(), args=(1,))
-
-
+stop_threads = False
+thread = threading.Thread(target=send_all_data, args =(lambda : stop_threads))
+ 
 #Connect to database
 try: 
     client = MongoClient(os.getenv("CONNECTION_STRING"))
@@ -31,20 +32,23 @@ router = APIRouter(
 )
 
 #Trigger
-@router.get("/trigger")
+@router.get("/")
 def trigger():
     ##stop thred
-    thread.stop()
+    stop_threads = True
+    print('thread killed')
     
     modelName = []
     results = collection.find({})
     for result in results:
         modelName.append(result["modelName"])
-        
+    stop_threads = False   
     
         
     ## start Thred
-    thread.start()
+    #new_thread = threading.Thread(target=send_all_data, args =(lambda : stop_threads))
+    #new_thread.start()
+
     return {"triggered"}
 
 
