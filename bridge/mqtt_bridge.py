@@ -14,16 +14,18 @@ producer = KafkaProducer(bootstrap_servers=brokers)
 modelName = []
 
 #Connect to database
-try: 
+try:
+    modelName = []
     client = MongoClient(os.getenv("CONNECTION_STRING"))
     db = client["iotHealthcare"]
     collection = db["medicalModel"]
     results = collection.find({})
     for result in results:
-       modelName.append(result["modelName"])
-    #print(modelName)
+        modelName.append(result["modelName"])
 except Exception:
     print("Error:" + Exception)
+
+
 
 ## KAFKA
 def send_message_to_kafka(topic, message):
