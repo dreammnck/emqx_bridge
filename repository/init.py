@@ -3,7 +3,7 @@ import os
 import ssl
 from dotenv import load_dotenv
 
-load_dotenv("/Volumes/project/capstone-project/emqx_bridge/.env")
+load_dotenv(".env")
 
 def get_model():
     try:
@@ -14,6 +14,7 @@ def get_model():
         results = collection.find({})
         for result in results:
             modelName.append(result["modelName"])
+        print(modelName)
         return modelName
     except Exception:
         print("Error:" + Exception)

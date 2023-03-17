@@ -6,7 +6,7 @@ from bridge.mqtt_bridge import send_all_data
     
 
 
-load_dotenv("/Volumes/project/capstone-project/emqx_bridge/.env")
+load_dotenv(".env")
 
 #stop_threads = False
 #thread = threading.Thread(target=send_all_data)

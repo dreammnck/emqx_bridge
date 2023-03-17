@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 import os
 import ssl
 
-load_dotenv("/Volumes/project/capstone-project/emqx_bridge/.env")
+load_dotenv(".env")
 
 
 def init_producer():

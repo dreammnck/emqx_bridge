@@ -1,0 +1,22 @@
+version: '3.6'
+services:
+  emqx_server:
+    image: emqx:5.0
+    ports:
+      - 18083:18083
+      - 1883:1883
+    volumes:
+      - ./emqx/log:/opt/emqx/log
+      - ./emqx/data:/opt/emqx/data
+    networks:
+      - emqx_bridge
+  bridge: 
+    image: "dreammnck/capstone:4.0.0"
+    depends_on: 
+      - emqx_server
+    volumes:
+      - ./.env:/usr/src/app/.env
+    networks:
+      - emqx_bridge
+networks:
+  emqx_bridge:

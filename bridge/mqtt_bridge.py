@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 import os
 from  kafka_client.init import init_producer
 from repository.init import get_model
-load_dotenv("/Volumes/project/capstone-project/emqx_bridge/.env")
+load_dotenv(".env")
 
 
 
