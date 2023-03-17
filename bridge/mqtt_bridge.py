@@ -7,10 +7,12 @@ import time
 from dotenv import load_dotenv
 import os
 
-load_dotenv("/Users/marineyatajoparung/Documents/GitHub/emqx_bridge/env/.env")
+load_dotenv("../.env")
 
 brokers = os.getenv("KAFKA_ADVERTISED_HOST_NAME","").split(",")
-producer = KafkaProducer(bootstrap_servers=brokers)
+SASL_USERNAME=os.gentenv("KAFKA_SASL_USERNAME")
+SASL_PASSWORD=os.gentenv("KAFKA_SASL_PASSWORD")
+producer = KafkaProducer(bootstrap_servers=brokers,security_protocol="SASL_SSL",  sasl_mechanism="SCRAM-SHA-512", sasl_plain_username=SASL_USERNAME, sasl_plain_password=SASL_PASSWORD)
 modelName = []
 
 #Connect to database
