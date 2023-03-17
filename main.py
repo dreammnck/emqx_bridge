@@ -1,11 +1,15 @@
 from fastapi import FastAPI
-from controller import trigger
+from controller.trigger import router
+
 
 app = FastAPI()
-app.include_router(trigger.router)
+app.include_router(router)
 
 
-if __name__ == "__main__":
-    @app.get("/")
-    def root():
-        return {"Hello": "World"}
+@app.get("/")
+def root():
+    return {"Hello":"World"}
+    
+    
+    
+
