@@ -14,7 +14,19 @@ load_dotenv("/Volumes/project/capstone-project/emqx_bridge/.env")
 process = Process(target=send_all_data)
 process.start()
 
+    
 
+#Connect to database
+# try: 
+#     client = MongoClient(os.getenv("CONNECTION_STRING"))
+#     #print(client.list_database_names())
+#     db = client["iotHealthcare"]
+#     collection = db["medicalModel"]
+#     results = collection.find({})
+#     for result in results:
+#        modelName.append(result["modelName"])
+# except Exception:
+#     print("Error:" + Exception)
 
 
 router = APIRouter(
