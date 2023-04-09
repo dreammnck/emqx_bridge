@@ -1,22 +1,28 @@
 from fastapi import APIRouter
 from pymongo import MongoClient
 import threading
-from multiprocessing import Process
 from dotenv import load_dotenv
 import os
-from bridge.mqtt_bridge import send_all_data, modelName
-    
-
+from os import getppid, kill
+import time
+from signal import SIGKILL
+from bridge.mqtt_bridge import send_all_data, modelName, exitflag1
 
 load_dotenv("/Users/marineyatajoparung/Documents/GitHub/emqx_bridge/env/.env")
+
+
 
 #stop_threads = False
 #thread = threading.Thread(target=send_all_data)
 #thread = threading.Thread(target=send_all_data, args =(lambda : stop_threads))
-process = Process(target=send_all_data)
-process.start()
+#n = 1
 
-    
+thread = threading.Thread(target=send_all_data, args =(lambda : exitflag1, ))
+thread.start()
+#exec("process" + str(n) + " = Process(target=send_all_data)")
+#exec("process" + str(n) + ".start()")
+
+  
 
 #Connect to database
 try: 
@@ -36,13 +42,21 @@ router = APIRouter(
     tags=["trigger"],
 )
 
+             
 #Trigger
 @router.get("/")
 def trigger():
-    ##stop thred
-    #stop_threads = True
-    process.kill()
     
+    #global n
+    global exitflag1
+    global thread
+
+    exitflag1 = True
+    thread.join()
+    
+    #exec("process" + str(n) + ".kill()")
+    #n+=1
+    #print(n)
     modelName = []
     client = MongoClient(os.getenv("CONNECTION_STRING"))
     db = client["iotHealthcare"]
@@ -52,14 +66,16 @@ def trigger():
         modelName.append(result["modelName"])
     print(modelName)
     
-    #stop_threads = False   
-    ## start Thred
-    new_process = Process(target=send_all_data)
-    new_process.start()
-    #process = Process(target=send_all_data)
-    #process.start()
+ 
 
-    return {"triggered"}
+    thread = threading.Thread(target=send_all_data, args =(lambda : exitflag1, ))
+    thread.start()
+    #exec("process" + str(n) + " = Process(target=send_all_data)")
+    #exec("print('process" + str(n) + " = Process(target=send_all_data)')")
+    #exec("process" + str(n) + ".start()")
+
+    return {"triggerd"}
+
 
 
 

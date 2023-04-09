@@ -7,11 +7,14 @@ import time
 from dotenv import load_dotenv
 import os
 
+
 load_dotenv("/Users/marineyatajoparung/Documents/GitHub/emqx_bridge/env/.env")
 
 brokers = os.getenv("KAFKA_ADVERTISED_HOST_NAME","").split(",")
 producer = KafkaProducer(bootstrap_servers=brokers)
 modelName = []
+
+exitflag1 = False
 
 #Connect to database
 try:
@@ -58,8 +61,6 @@ def on_connect(client, userdata, flags, rc):
         
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
-    for model in modelName:
-        client.subscribe(model)
 
 def on_disconnect(client, user_data, rc):
     """
@@ -78,6 +79,7 @@ def on_disconnect(client, user_data, rc):
 
 
 def on_message(client, userdata, msg):
+
     """
     The callback for when a PUBLISH message is received from the server.
     :param client:
@@ -85,12 +87,15 @@ def on_message(client, userdata, msg):
     :param msg:
     :return: None
     """
+
+    send_message_to_kafka(msg.topic, msg.payload)    
     print(msg.topic+" "+str(msg.payload))
-    send_message_to_kafka(msg.topic, msg.payload)
+    
 
 
 def mqtt_to_kafka_run():
     #Pick messages off MQTT queue and put them on Kafka
+    
     broker = os.getenv("EMQX_BROKER")
     port = int(os.getenv("EMQX_PORT"))
     username = os.getenv("EMQX_USERNAME")
@@ -99,23 +104,40 @@ def mqtt_to_kafka_run():
 
     client = mqtt.Client(f'python-mqtt-{random.randint(0, 1000)}')
     client.username_pw_set(username, password)
-    client.on_connect = on_connect
+    #client.on_connect = on_connect
     client.on_message = on_message
     client.on_disconnect = on_disconnect
     
     client.connect(broker, port, 1000)
-    client.loop_forever()
+    # client.loop_start()
+    
+    for model in modelName:
+        client.subscribe(model)
+        
+    while True:
+        client.loop_start()
+        if exitflag1:
+            break
+    
+    
+    
 
-def send_all_data():
+        
+def send_all_data(stop):
     attempts = 0
-    while attempts < 10:
-        try:
-            mqtt_to_kafka_run()
+    #global is_set
+    mqtt_to_kafka_run()
 
-        except NoBrokersAvailable:
-            print("No Brokers. Attempt %s" % attempts)
-            attempts = attempts + 1
-            time.sleep(2)
+    #while (attempts < 10):
+    #    if not(is_set): break
+    #    else:
+    #        try:
+    #            mqtt_to_kafka_run()
+
+     #       except NoBrokersAvailable:
+      #          print("No Brokers. Attempt %s" % attempts)
+       #         attempts = attempts + 1
+        #        time.sleep(2)
     
             
             
